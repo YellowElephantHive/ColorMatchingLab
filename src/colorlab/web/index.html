@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="染整對色模型的互動式實驗展示：工單隔離評估、色差探索與離線模型推論。">
+  <title>Chroma — Color Matching Lab</title>
+  <style>/* COLORLAB_STYLE */</style>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#"><span class="brandmark"><i></i><i></i><i></i><i></i></span><span>chroma<small>COLOR MATCHING LAB</small></span></a>
+    <div class="side-label">PROJECT SHOWCASE</div>
+    <nav aria-label="主要導覽">
+      <button class="nav active" data-tab="results"><span>◈</span>結果探索</button>
+      <button class="nav" data-tab="playground"><span>◉</span>互動預測</button>
+      <button class="nav" data-tab="engineering"><span>▤</span>工程與方法</button>
+    </nav>
+    <div class="side-story"><div class="weave" aria-hidden="true"></div><p>從染整製程<br>到機器學習應用</p><small>製程知識 × 機器學習<br>TEXTILE QUALITY PREDICTION</small></div>
+    <div class="side-footer">企業對色預測專案<small>完整模型已於公司部署<br>製程分析 · 模型評估 · 互動展示</small></div>
+  </aside>
+  <main>
+    <header class="topbar"><div class="breadcrumb">Applied machine learning <span>/</span> Textile manufacturing</div><div class="header-actions"><div class="language-switch" role="group" aria-label="語言" data-no-i18n><button id="language-en" data-language="en" lang="en" class="active">English</button><button id="language-zh" data-language="zh" lang="zh-Hant">中文</button></div><button id="export" class="button secondary">匯出評估 CSV</button></div></header>
+    <section class="hero">
+      <div><div class="eyebrow">COLOR MEASUREMENTS, EXPLAINED.</div><h1>在染整流程中，<br><span>提前辨識對色風險。</span></h1><p>以色差特徵預測流程合格標記，探索哪些樣本容易誤判，<br class="wide-only">以及模型判定如何隨量測變化。</p></div>
+      <div class="process" aria-label="染後 DY、中檢 MN、成品 IN 製程"><div class="process-caption">PROCESS KNOWLEDGE MEETS MACHINE LEARNING</div><div class="stages"><div id="stage-dy" class="stage"><b>DY</b><span>染後量測</span></div><span class="connector"></span><div id="stage-mn" class="stage"><b>MN</b><span>撥水中檢</span></div><span class="connector"></span><div class="stage"><b>IN</b><span>成品對色</span></div></div><p>預測目標：原始流程 PASS / NO-PASS<br><span>涵蓋染後、中檢與終檢的流程判定。</span></p></div>
+    </section>
+    <section class="experiment-bar"><div class="segmented" id="experiments" aria-label="選擇實驗"></div><div class="run-meta"><span class="dot"></span><span id="run-label">工單隔離 · 5-fold OOF</span></div></section>
+    <div id="experiment-description" class="experiment-description"></div>
+    <div class="controls"><label>模型<select id="model"><option value="rf">Random Forest</option><option value="logistic">Logistic Regression</option><option value="majority">Majority baseline</option><option value="cmc">CMC ≤ 1 rule</option></select></label><label class="threshold-control">PASS 判定門檻 <input id="threshold" type="range" min="0.05" max="0.95" step="0.01" value="0.5"><output id="threshold-value">0.50</output></label><button id="reset-threshold" class="text-button">重設</button><span class="control-note" id="threshold-note">OOF 評估 · 門檻 0.50</span></div>
+
+    <section id="tab-results" class="tab-panel">
+      <div class="metrics"><article><span>PASS F1 · OOF</span><strong id="metric-f1">—</strong><small id="metric-spread"></small></article><article><span>NO-PASS 召回率</span><strong id="metric-recall">—</strong><small>實際不合格中，被辨識出的比例</small></article><article><span>驗證樣本</span><strong id="metric-samples">—</strong><small id="metric-groups"></small></article><article><span>誤判為合格</span><strong id="metric-miss" class="orange">—</strong><small id="metric-miss-note"></small></article></div>
+      <div class="results-grid">
+        <article class="card scatter-card"><div class="card-heading"><div><div class="eyebrow">SAMPLE EXPLORER</div><h2>色差與判定</h2></div><div class="legend"><span><i class="green-dot"></i>實際合格</span><span><i class="orange-dot"></i>實際不合格</span><span>○ 誤判</span></div></div>
+          <div class="plot-controls"><label>X 軸<select id="axis-x"><option value="2">Δa · 紅綠差</option><option value="0">DE · CMC 色差</option><option value="1">ΔL · 明度差</option><option value="3">Δb · 黃藍差</option></select></label><label>Y 軸<select id="axis-y"><option value="3">Δb · 黃藍差</option><option value="0">DE · CMC 色差</option><option value="1">ΔL · 明度差</option><option value="2">Δa · 紅綠差</option></select></label><label>篩選<select id="filter"><option value="all">所有樣本</option><option value="errors">所有誤判</option><option value="fp">不合格誤判為合格</option><option value="fn">合格誤判為不合格</option><option value="tn">正確辨識不合格</option><option value="tp">正確辨識合格</option></select></label></div>
+          <div class="plot-wrap"><canvas id="scatter" role="img" aria-label="色差散佈圖，可選取樣本；下方亦提供樣本選單"></canvas><div id="tooltip" class="tooltip" hidden></div></div>
+          <div class="plot-footer"><span id="plot-count"></span><span>點選樣本查看預測；顏色為真實標記</span></div>
+          <div class="selected-sample"><label>選取樣本<select id="sample-select" aria-label="選取散佈圖樣本"></select></label><div id="case-detail"></div><button id="try-sample" class="button secondary">在互動預測中開啟</button></div>
+        </article>
+        <article class="card confusion-card"><div class="eyebrow">OUT-OF-FOLD PREDICTIONS</div><h2>判定結果與誤判分析</h2><p class="muted">每筆預測皆來自未見過該工單的模型。<br>點選矩陣，查看對應樣本。</p><div class="matrix"><div></div><div class="matrix-label">預測不合格</div><div class="matrix-label">預測合格</div><div class="matrix-label row-label">實際<br>不合格</div><button id="cm-tn" class="cell correct" data-filter="tn"></button><button id="cm-fp" class="cell error" data-filter="fp"></button><div class="matrix-label row-label">實際<br>合格</div><button id="cm-fn" class="cell error" data-filter="fn"></button><button id="cm-tp" class="cell correct" data-filter="tp"></button></div><div class="matrix-note"><b id="accuracy-note"></b><span id="balance-note"></span></div><div class="context-note">調整 PASS 門檻，觀察誤判放行與誤判攔下的取捨。</div></article>
+      </div>
+      <div class="bottom-grid"><article class="card"><div class="card-heading"><div><div class="eyebrow">SAME FOLDS, FOUR REFERENCES</div><h2>模型與基準比較</h2></div><span class="pill">同一組資料分割</span></div><div class="table-wrap"><table><thead><tr><th>模型</th><th>PASS F1</th><th>Macro F1</th><th>NO-PASS Recall</th></tr></thead><tbody id="comparison"></tbody></table></div><p class="small muted">使用相同資料分割，比較機器學習模型、多數類基準與 CMC 色差規則。</p></article><article class="card"><div class="eyebrow">FEATURE CONTRIBUTION</div><h2>哪些特徵影響 RF 表現？</h2><div id="importance" class="importance"></div><p class="small muted">以驗證集 permutation importance，觀察打亂各項特徵後 PASS F1 的平均變化。</p></article></div>
+    </section>
+
+    <section id="tab-playground" class="tab-panel" hidden>
+      <div class="section-intro"><div><div class="eyebrow">LIVE MODEL, IN YOUR BROWSER</div><h2>改變量測，觀察判定邊界。</h2><p>以本次資料訓練的模型即時試算，調整 Lab 量測即可觀察預測反應，離線也能操作。</p></div><button id="load-selected" class="button secondary">載入選取案例</button></div>
+      <div class="lab-grid"><article class="card lab-inputs"><h3>標準與量測</h3><div class="swatches"><div><div id="target-swatch" class="swatch"></div><span>IN 成品標準</span></div><div><div id="sample-swatch" class="swatch"></div><span id="sample-stage-label">DY 樣本量測</span></div></div><p class="small muted">色塊以 D65 / sRGB 呈現標準樣與量測的近似色彩。</p><div class="lab-triple"><b>IN 標準 Lab</b><label>L*<input id="target-l" type="number" min="0" max="100" step="any"></label><label>a*<input id="target-a" type="number" min="-160" max="160" step="any"></label><label>b*<input id="target-b" type="number" min="-160" max="160" step="any"></label></div><div id="reference-inputs" class="lab-triple"><b>DY 色差參考 Lab</b><label>L*<input id="ref-l" type="number" min="0" max="100" step="any"></label><label>a*<input id="ref-a" type="number" min="-160" max="160" step="any"></label><label>b*<input id="ref-b" type="number" min="-160" max="160" step="any"></label></div><div id="delta-controls" class="delta-controls"></div><div id="input-error" class="input-error" role="alert" hidden></div><div class="lab-actions"><button id="example-pass" class="text-button">合格案例</button><button id="example-fail" class="text-button">不合格案例</button></div><div id="live-features" class="feature-chips"></div></article>
+        <article class="card decision-card"><div class="card-heading"><div><div class="eyebrow">DECISION SURFACE</div><h2>目前明度差下的判定分布</h2></div><span class="pill">ΔL 固定 · Δa / Δb 可變</span></div><div class="decision-wrap"><canvas id="decision" role="img" aria-label="固定明度差下，紅綠差與黃藍差的模型判定分布；可用左側滑桿調整"></canvas></div><div class="decision-legend"><span>較低 PASS 分數</span><i></i><span>較高 PASS 分數</span></div><div class="prediction-box"><div><span>完整資料模型的即時試算</span><strong id="live-decision"></strong></div><div class="live-score"><span>PASS 模型分數</span><strong id="live-score"></strong></div></div><p id="live-context" class="small muted"></p><p id="range-warning" class="context-note" hidden></p><p class="small muted">色面呈現不同色差組合的模型判定。點選色面，可直接調整 Δa / Δb。</p></article></div>
+    </section>
+
+    <section id="tab-engineering" class="tab-panel" hidden>
+      <div class="section-intro"><div><div class="eyebrow">FROM EXPERIMENT TO REPRODUCIBLE SOFTWARE</div><h2>可追溯的資料，可重現的結果。</h2><p>將製程資料處理、特徵設計、模型評估、推論與視覺化整合成可重現的工程流程。</p></div></div>
+      <div class="pipeline"><div><b>01</b><strong>原始資料</strong><small>唯讀輸入 · SHA-256</small></div><div><b>02</b><strong>特徵契約</strong><small>CMC(2:1) + 有號 Lab 差</small></div><div><b>03</b><strong>工單隔離</strong><small>5-fold OOF · 無群組重疊</small></div><div><b>04</b><strong>模型與證據</strong><small>模型檔 · 逐筆預測 · 分割紀錄</small></div><div><b>05</b><strong>互動展示</strong><small>離線 HTML · CLI · API</small></div></div>
+      <div class="bottom-grid"><article class="card"><div class="eyebrow">CURRENT DATASET</div><h2>資料處理與評估規模</h2><dl id="audit" class="audit"></dl><p class="small muted">依 DY 與 MN 製程階段，選取對應量測建立模型比較。</p></article><article class="card"><div class="eyebrow">WHAT CHANGED</div><h2>從製程資料到模型應用</h2><ul class="method-list"><li><b>明確定義標記</b><span>整理 PASS / NO-PASS 標記，處理缺值、重複與衝突紀錄。</span></li><li><b>隔離相關樣本</b><span>同一基礎工單（含 A/B 後綴）與完全相同 Lab 輸入留在同一折。</span></li><li><b>統一特徵計算</b><span>DE 重算 CMC(2:1)；ΔL、Δa、Δb 為量測減 IN 標準。撥水 DE 以 DY 標準為參考。</span></li><li><b>MN 使用實測值</b><span>依製程階段選取 DY 或 MN 量測，將實測來源與補值來源分開管理。</span></li><li><b>成果可追溯</b><span>每次執行產生模型檔、逐筆預測、資料分割與來源雜湊，方便比較與重跑。</span></li></ul></article></div>
+      <article class="card method-card"><h2>專案亮點</h2><div class="method-columns"><div><h3>製程知識與特徵設計</h3><p>結合染整流程、Lab 量測與 CMC 色差，將現場對色判定轉化為可建模的資料問題，涵蓋 QD 與撥水加工情境。</p></div><div><h3>企業應用</h3><p>專案完整模型已於公司部署。本作品透過製程分析、模型比較與即時試算，呈現從實驗開發到企業應用的技術經驗。</p></div><div><h3>工程化與互動展示</h3><p>整合可重跑的訓練流程、Python 推論介面、模型一致性測試與中英文互動視覺化，讓模型成果可以直接操作與說明。</p></div></div><details><summary>技術方法與執行資訊</summary><p class="small muted">結果頁呈現工單分組的 OOF 評估；互動頁使用本次完整資料訓練的模型。PASS 為流程合格標記，畫面數值為模型分數。</p><code>uv run --no-sync colorlab train --out artifacts/run-02</code><code>uv run --no-sync colorlab export --run artifacts/run-02</code><pre id="provenance"></pre></details></article>
+    </section>
+    <footer><span>Chroma / Color Matching Lab</span><span id="footer-run"></span><span>Applied ML portfolio · Interactive & offline</span></footer>
+  </main>
+  <script type="application/json" id="report-data">__COLORLAB_DATA__</script>
+  <script>/* COLORLAB_I18N */</script>
+  <script>/* COLORLAB_ENGINE */</script>
+  <script>/* COLORLAB_APP */</script>
+</body>
+</html>

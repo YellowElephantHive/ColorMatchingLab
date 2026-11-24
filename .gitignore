@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+.DS_Store
+legacy/
+data/raw/
+artifacts/
+reports/
+*.zip
+dist/
+build/
+deliverables/
+docs/SOURCE_MANIFEST.json

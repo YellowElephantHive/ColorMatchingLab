@@ -1,0 +1,9 @@
+{
+  "experiment": "qd_dy",
+  "model": "rf",
+  "threshold": 0.5,
+  "records": [
+    {"target": [50, 4, -3], "sample": [51, 5, -3]},
+    {"target": [50, 4, -3], "sample": [56, 9, -8]}
+  ]
+}
